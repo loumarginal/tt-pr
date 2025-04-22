@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -30,7 +31,6 @@ const TranslatorForm = () => {
   const [sourceLanguage, setSourceLanguage] = useState("en");
   const [targetLanguage, setTargetLanguage] = useState("es");
   const [translationMode, setTranslationMode] = useState("literal");
-  const [selectedModel, setSelectedModel] = useState("deepseek");
   const [loading, setLoading] = useState(false);
 
   const handleTranslate = async () => {
@@ -38,8 +38,10 @@ const TranslatorForm = () => {
     
     setLoading(true);
     
+    // Here you would implement the Google Gemini API call
+    // For now, we'll use a mock response
     setTimeout(() => {
-      setTranslatedText(`[${selectedModel} translation using ${translationMode} mode from ${sourceLanguage} to ${targetLanguage}]\n\n${sourceText}`);
+      setTranslatedText(`[Translation from ${sourceLanguage} to ${targetLanguage} using ${translationMode} mode]\n\n${sourceText}`);
       setLoading(false);
     }, 1000);
   };
@@ -57,23 +59,6 @@ const TranslatorForm = () => {
 
   return (
     <div className="w-full max-w-5xl mx-auto space-y-4">
-      <div className="flex justify-center gap-4 mb-6">
-        <Button
-          variant={selectedModel === "deepseek" ? "default" : "outline"}
-          onClick={() => setSelectedModel("deepseek")}
-          className="min-w-[140px]"
-        >
-          DeepSeek
-        </Button>
-        <Button
-          variant={selectedModel === "gemini" ? "default" : "outline"}
-          onClick={() => setSelectedModel("gemini")}
-          className="min-w-[140px]"
-        >
-          Google Gemini
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div>
           <div className="flex justify-between mb-2">
