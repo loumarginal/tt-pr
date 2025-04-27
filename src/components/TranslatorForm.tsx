@@ -33,18 +33,70 @@ const TranslatorForm = () => {
   const [translationMode, setTranslationMode] = useState("literal");
   const [loading, setLoading] = useState(false);
 
-  const handleTranslate = async () => {
-    if (!sourceText.trim()) return;
+  // const handleTranslate = async () => {
+  //   if (!sourceText.trim()) return;
     
-    setLoading(true);
+  //   setLoading(true);
     
-    // Here you would implement the Google Gemini API call
-    // For now, we'll use a mock response
-    setTimeout(() => {
-      setTranslatedText(`[Translation from ${sourceLanguage} to ${targetLanguage} using ${translationMode} mode]\n\n${sourceText}`);
-      setLoading(false);
-    }, 1000);
-  };
+  //   // Here you would implement the Google Gemini API call
+  //   // For now, we'll use a mock response
+  //   setTimeout(() => {
+  //     setTranslatedText(`[Translation from ${sourceLanguage} to ${targetLanguage} using ${translationMode} mode]\n\n${sourceText}`);
+  //     setLoading(false);
+  //   }, 1000);
+  // };
+
+  // Cambiar tu función handleTranslate:
+const handleTranslate = async () => {
+  if (!sourceText.trim()) return;
+
+  setLoading(true);
+
+  try {
+    console.log('Starting translation process...');
+    const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    console.log('API Key available:', !!apiKey);
+    
+    const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
+    console.log('Request URL:', url);
+
+    const requestBody = {
+      contents: [{
+        parts: [{
+          text: `Translate the following text from ${sourceLanguage} to ${targetLanguage} using ${translationMode} style:\n\n${sourceText}`
+        }]
+      }]
+    };
+    console.log('Request body:', requestBody);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+    console.log('Response status:', response.status);
+
+    const data = await response.json();
+    console.log('Response data:', data);
+
+    if (data && data.candidates && data.candidates.length > 0) {
+      const textResult = data.candidates[0].content.parts[0].text;
+      console.log('Translation result:', textResult);
+      setTranslatedText(textResult);
+    } else {
+      console.warn('No translation candidates found in response');
+      setTranslatedText("No translation found.");
+    }
+  } catch (error) {
+    console.error("Error translating:", error);
+    setTranslatedText("Error during translation.");
+  } finally {
+    console.log('Translation process completed');
+    setLoading(false);
+  }
+};
 
   const handleSwapLanguages = () => {
     const temp = sourceLanguage;
