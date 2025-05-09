@@ -12,10 +12,11 @@ const languages = [
   { code: "es", name: "Spanish" },
   { code: "fr", name: "French" },
   { code: "ar", name: "Arabic" },
-  { code: "bn", name: "Bengali" },
+  { code: "kr", name: "Korea" },
   { code: "ru", name: "Russian" },
   { code: "pt", name: "Portuguese" },
   { code: "id", name: "Indonesian" },
+  { code: "jp", name: "Japanese" },
 ];
 
 const translationModes = [
@@ -60,10 +61,15 @@ const handleTranslate = async () => {
     const url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + apiKey;
     console.log('Request URL:', url);
 
+    // Calculate input tokens (rough estimation: 1 token ≈ 4 characters)
+    const promptText = `Translate the following text from ${sourceLanguage} to ${targetLanguage} using ${translationMode} style:\n\n${sourceText}`;
+    const estimatedInputTokens = Math.ceil(promptText.length / 4);
+    console.log('Estimated input tokens:', estimatedInputTokens);
+
     const requestBody = {
       contents: [{
         parts: [{
-          text: `Translate the following text from ${sourceLanguage} to ${targetLanguage} using ${translationMode} style:\n\n${sourceText}`
+          text: promptText
         }]
       }]
     };
@@ -83,6 +89,10 @@ const handleTranslate = async () => {
 
     if (data && data.candidates && data.candidates.length > 0) {
       const textResult = data.candidates[0].content.parts[0].text;
+      // Calculate output tokens
+      const estimatedOutputTokens = Math.ceil(textResult.length / 4);
+      console.log('Estimated output tokens:', estimatedOutputTokens);
+      console.log('Total estimated tokens:', estimatedInputTokens + estimatedOutputTokens);
       console.log('Translation result:', textResult);
       setTranslatedText(textResult);
     } else {
@@ -97,7 +107,6 @@ const handleTranslate = async () => {
     setLoading(false);
   }
 };
-
   const handleSwapLanguages = () => {
     const temp = sourceLanguage;
     setSourceLanguage(targetLanguage);
